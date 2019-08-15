@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
+
 const users = require('./routes/api/users');
 const profile = require('./routes/api/profile');
 const posts = require('./routes/api/posts');
@@ -11,6 +12,8 @@ const posts = require('./routes/api/posts');
 const PORT = process.env.PORT|| 4001;
 
 app.use(cors());
+
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/devconnector2', { useNewUrlParser: true });
 const connection = mongoose.connection;
