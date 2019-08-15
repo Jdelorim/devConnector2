@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const users = require('./routes/api/users');
+const profile = require('./routes/api/profile');
+const posts = require('./routes/api/posts');
 
 const PORT = process.env.PORT|| 4001;
 
@@ -19,9 +22,9 @@ if(process.env.NODE_ENV === 'production') {
     app.use(express.static('client/build'));
 }
 
-require('./routes/api/posts')(app);
-require('./routes/api/users')(app);
-require('./routes/api/profile')(app);
+app.use('/api/users', users);
+app.use('/api/profile', profile);
+app.use('/api/posts', posts);
 
 app.listen(PORT,function(){
     console.log(`server is running on port: ${PORT}`);

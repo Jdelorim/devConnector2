@@ -1,8 +1,8 @@
-const router = require('express').Router();
+const express = require('express');
+const router = express.Router();
 
-module.exports = (app) => {
-    router.get('/test',(req,res)=>{
-        
-        res.json({msg: 'Profile helloooo'});
-    })
-}
+router.get('/test',(req,res)=>{
+    res.json({msg: 'profile helloooo'});
+});
+
+module.exports = router;
