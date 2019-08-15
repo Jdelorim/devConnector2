@@ -3,6 +3,8 @@ const router = express.Router();
 const gravatar = require('gravatar');
 const User = require('../../models/User');
 const bcyrpt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const keys = require('../../config/keys');
 
 router.get('/test',(req,res) => {
     res.json({msg: 'users helloooo'});
@@ -37,5 +39,31 @@ router.post('/register',(req,res) => {
             }
         })
 });
+
+router.post('/login', (req, res) => {
+   const {email, password} = req.body;
+   User.findOne({email})
+        .then(data => {
+            if(!data) {
+                return res.status(404).json({eamil: 'User not found'});
+            }
+            bcyrpt.compare(password, data.password)
+                .then(isMatch => {
+                    if(isMatch) {
+                        const payload = { id: data.id, name: data.name, avatar: data.avatar }
+                       jwt.sign(payload, keys.secretOrKey, { expiresIn: 3600*4 }, (err, token) => {
+                           res.json({
+                               success: true,
+                               token: 'Bearer ' + token
+                           });
+
+                       });
+                    } else {
+                        return res.status(400).json({password: 'Password incorrect'});
+                    }
+                });
+        })
+})
+
 
 module.exports = router;
