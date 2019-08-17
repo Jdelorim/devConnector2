@@ -4,10 +4,12 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const passport = require('passport');
 
 const users = require('./routes/api/users');
 const profile = require('./routes/api/profile');
 const posts = require('./routes/api/posts');
+
 
 const PORT = process.env.PORT|| 4001;
 
@@ -21,9 +23,13 @@ connection.once('open', function() {
     console.log("MongoDB database connection established successfully");
 })
 
+app.use(passport.initialize());
+require('./config/passport.js')(passport);
+
 if(process.env.NODE_ENV === 'production') {
     app.use(express.static('client/build'));
 }
+
 
 app.use('/api/users', users);
 app.use('/api/profile', profile);

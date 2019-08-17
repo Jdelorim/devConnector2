@@ -5,15 +5,21 @@ const User = require('../../models/User');
 const bcyrpt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const keys = require('../../config/keys');
+const passport = require('passport');
 
-router.get('/test',(req,res) => {
-    res.json({msg: 'users helloooo'});
-});
+const validateRegisterInput = require('../../validation/register');
+const validateLoginInput = require('../../validation/login');
 
 router.post('/register',(req,res) => {
+    const { errors, isValid } = validateRegisterInput(req.body);
+    if(!isValid) {
+        return res.status(400).json(errors);
+    }   
+
     User.findOne({ email: req.body.email })
         .then(data => {
             if(data) {
+                errors.email = 'Email already exists';
                 return res.status(400).json({email: 'Email already exists'});
             } else {
                 const avatar = gravatar.url(req.body.email, {
@@ -41,11 +47,16 @@ router.post('/register',(req,res) => {
 });
 
 router.post('/login', (req, res) => {
+    const {errors, isValid} = validateLoginInput(req.body);
+    if(!isValid) {
+        return res.status(400).json(errors);
+    }
    const {email, password} = req.body;
    User.findOne({email})
         .then(data => {
             if(!data) {
-                return res.status(404).json({eamil: 'User not found'});
+                errors.email = 'User not found';
+                return res.status(404).json({errors});
             }
             bcyrpt.compare(password, data.password)
                 .then(isMatch => {
@@ -56,14 +67,18 @@ router.post('/login', (req, res) => {
                                success: true,
                                token: 'Bearer ' + token
                            });
-
-                       });
+                        });
                     } else {
-                        return res.status(400).json({password: 'Password incorrect'});
+                        errors.password = 'Password incorrect';
+                        return res.status(400).json({errors});
                     }
                 });
-        })
-})
+        });
+});
+
+router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
+    res.json({ id: req.user.id, name: req.user.name, email: req.user.email });
+});
 
 
 module.exports = router;
