@@ -5,7 +5,6 @@ const path = require('path');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const passport = require('passport');
-
 const users = require('./routes/api/users');
 const profile = require('./routes/api/profile');
 const posts = require('./routes/api/posts');
